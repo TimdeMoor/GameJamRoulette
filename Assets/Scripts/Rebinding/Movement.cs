@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Popups;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -10,8 +11,20 @@ public class Movement : MonoBehaviour
     private DefaultControls input;
     private Vector2 moveDirection = Vector2.zero;
     private Rigidbody2D rb;
-    public float speed = 100f;
+    public float walkSpeed = 100f;
+    public float sprintSpeed = 250f;
 
+    public bool isSprinting = false;
+
+    [SerializeField] private float lightAttackCooldown = .3f;
+    [SerializeField] private float heavyAttackCooldown = 1f;
+
+    private float lightAttackCooldownTimer = 0f;
+    private float heavyAttackCooldownTimer = 0f;
+    
+    private bool lightAttackReady => lightAttackCooldownTimer <= 0f;
+    private bool heavyAttackReady => heavyAttackCooldownTimer <= 0f;
+    
     private void Awake()
     {
         input = new DefaultControls();
@@ -25,11 +38,26 @@ public class Movement : MonoBehaviour
         input.InGame.Move.performed += OnMovementPerformed;
         input.InGame.Move.canceled += OnMovementCanceled;
 
-        input.InGame.Attack.performed += OnAttackPerformed;
+        input.InGame.LightAttack.performed += OnLightAttackPerformed;
         input.InGame.Interact.performed += OnInteractPerformed;
         input.InGame.Jump.performed += OnJumpPerformed;
+        input.InGame.HeavyAttack.performed += OnHeavyAttackPerformed;
+        
+        input.InGame.Sprint.performed += OnSprintPerformed;
+        input.InGame.Sprint.canceled += OnSprintCanceled;
+        
+        input.InGame.Pause.performed += OnPausePerformed;
     }
 
+    private void Update()
+    {
+        lightAttackCooldownTimer -= Time.deltaTime;
+        heavyAttackCooldownTimer -= Time.deltaTime;
+
+        lightAttackCooldownTimer = Mathf.Clamp(lightAttackCooldownTimer, 0f, lightAttackCooldown);
+        heavyAttackCooldownTimer = Mathf.Clamp(heavyAttackCooldownTimer, 0f, heavyAttackCooldown);
+    }
+    
     private void OnDisable()
     {
         input.Disable();
@@ -39,7 +67,7 @@ public class Movement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.velocity = moveDirection * speed;
+        rb.velocity = isSprinting ? moveDirection * sprintSpeed : moveDirection * walkSpeed;
     }
 
     private void OnMovementPerformed(InputAction.CallbackContext value)
@@ -49,21 +77,50 @@ public class Movement : MonoBehaviour
     
     private void OnJumpPerformed(InputAction.CallbackContext value)
     {
-        PopUpSpawner.instance.SpawnPopUp(transform.position, "Jump!");
+        Debug.Log("OnJumpPerformed");
     }
     
-    private void OnAttackPerformed(InputAction.CallbackContext value)
+    private void OnLightAttackPerformed(InputAction.CallbackContext value)
     {
-        PopUpSpawner.instance.SpawnPopUp(transform.position, "Attack!");
+        if (!lightAttackReady) return;
+        lightAttackCooldownTimer = lightAttackCooldown;
+        
+        Debug.Log("OnLightAttackPerformed");
+        CameraShaker.Instance.Shake(.2f, 10f);
     }
     
     private void OnInteractPerformed(InputAction.CallbackContext value)
     {
-        PopUpSpawner.instance.SpawnPopUp(transform.position, "Interact!");
+        Debug.Log("OnInteractPerformed");
     }
 
     private void OnMovementCanceled(InputAction.CallbackContext value)
     {
         moveDirection = Vector2.zero;
+    }
+
+    private void OnHeavyAttackPerformed(InputAction.CallbackContext value)
+    {
+        if (!heavyAttackReady) return;
+        heavyAttackCooldownTimer = heavyAttackCooldown;
+        
+        Debug.Log("OnHeavyAttackPerformed");
+        CameraShaker.Instance.Shake(.3f, 20f);
+
+    }
+
+    private void OnPausePerformed(InputAction.CallbackContext value)
+    {
+        Debug.Log("OnPausePerformed");
+    }
+    
+    private void OnSprintPerformed(InputAction.CallbackContext value)
+    {
+        isSprinting = true;
+    }
+    
+    private void OnSprintCanceled(InputAction.CallbackContext value)
+    {
+        isSprinting = false;
     }
 }

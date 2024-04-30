@@ -608,6 +608,12 @@ MonoBehaviour:
     rootOnly: 0
     recursive: 1
   _sceneHistory:
+  - name: View States
+    path: Assets/Plugins/Infinity Code/Ultimate Editor Enhancer/Examples/View States.unity
+  - name: Test 1
+    path: Assets/Scenes/Test 1.unity
+  - name: Test
+    path: Assets/Scenes/Test.unity
   - name: ControlsTest
     path: Assets/Scenes/ControlsTest.unity
   - name: TestScene
