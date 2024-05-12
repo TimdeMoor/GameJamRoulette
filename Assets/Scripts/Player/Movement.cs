@@ -1,9 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using Popups;
+using Unity.PlasticSCM.Editor.WebApi;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Switch;
 using UnityEngine.UI;
 
 public class Movement : MonoBehaviour
@@ -18,13 +21,17 @@ public class Movement : MonoBehaviour
 
     [SerializeField] private float lightAttackCooldown = .3f;
     [SerializeField] private float heavyAttackCooldown = 1f;
-
+    [SerializeField] private float comboCooldown = 3f;
+    
     private float lightAttackCooldownTimer = 0f;
     private float heavyAttackCooldownTimer = 0f;
-    
+    private float comboCooldownTimer = 0f;
+
     private bool lightAttackReady => lightAttackCooldownTimer <= 0f;
     private bool heavyAttackReady => heavyAttackCooldownTimer <= 0f;
-    
+
+    private string currentCombo = "";
+    private bool comboMode = false;    
     private void Awake()
     {
         input = new DefaultControls();
@@ -53,9 +60,16 @@ public class Movement : MonoBehaviour
     {
         lightAttackCooldownTimer -= Time.deltaTime;
         heavyAttackCooldownTimer -= Time.deltaTime;
+        comboCooldownTimer -= Time.deltaTime;
 
         lightAttackCooldownTimer = Mathf.Clamp(lightAttackCooldownTimer, 0f, lightAttackCooldown);
         heavyAttackCooldownTimer = Mathf.Clamp(heavyAttackCooldownTimer, 0f, heavyAttackCooldown);
+        comboCooldownTimer = Mathf.Clamp(comboCooldownTimer, 0f, comboCooldown);
+
+        if (comboCooldownTimer <= 0f && comboMode)
+        {
+            ResetCombo();
+        }
     }
     
     private void OnDisable()
@@ -84,9 +98,9 @@ public class Movement : MonoBehaviour
     {
         if (!lightAttackReady) return;
         lightAttackCooldownTimer = lightAttackCooldown;
-        
-        Debug.Log("OnLightAttackPerformed");
-        CameraShaker.Instance.Shake();
+
+        StartCombo("L");
+        CheckCombo();
     }
     
     private void OnInteractPerformed(InputAction.CallbackContext value)
@@ -103,10 +117,9 @@ public class Movement : MonoBehaviour
     {
         if (!heavyAttackReady) return;
         heavyAttackCooldownTimer = heavyAttackCooldown;
-        
-        Debug.Log("OnHeavyAttackPerformed");
-        CameraShaker.Instance.Shake();
 
+        StartCombo("H");
+        CheckCombo();
     }
 
     private void OnPausePerformed(InputAction.CallbackContext value)
@@ -122,5 +135,48 @@ public class Movement : MonoBehaviour
     private void OnSprintCanceled(InputAction.CallbackContext value)
     {
         isSprinting = false;
+    }
+
+    private void CheckCombo()
+    {
+        if (currentCombo.Length > 3)
+        {
+            currentCombo = currentCombo.Substring(currentCombo.Length - 3);
+        }
+        switch (currentCombo)
+        {
+            case "LLH":
+                Debug.Log("QuickSmash!");
+                CameraShaker.Instance.Shake();
+                ResetCombo();
+                break;
+            case "LLL":
+                Debug.Log("TripleStrike!");
+                CameraShaker.Instance.Shake();
+                ResetCombo();
+                break;
+            case "LHL":
+                Debug.Log("GroundPound!");
+                CameraShaker.Instance.Shake();
+                ResetCombo();
+                break;
+            default: 
+                Debug.Log("No Combo");
+                break;
+        }
+    }
+
+    private void StartCombo(string comboType)
+    {
+        comboMode = true;
+        currentCombo += comboType;
+        comboCooldownTimer = comboCooldown;
+    }
+    private void ResetCombo()
+    {
+        comboMode = false;
+        currentCombo = "";
+        comboCooldownTimer = 0f;
+        Debug.Log("ComboReset");
     }
 }

@@ -680,8 +680,9 @@ MonoBehaviour:
   walkSpeed: 5
   sprintSpeed: 10
   isSprinting: 0
-  lightAttackCooldown: 0.1
-  heavyAttackCooldown: 0.5
+  lightAttackCooldown: 0.05
+  heavyAttackCooldown: 0.05
+  comboCooldown: 1
 --- !u!212 &1199017711
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -779,6 +780,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   wanderRadius: 1
+  target: {fileID: 0}
 --- !u!1 &1281350600
 GameObject:
   m_ObjectHideFlags: 0
@@ -825,8 +827,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   affectedObjects:
   - {fileID: 330024925}
-  shakeDuration: 0.2
-  shakeMagnitude: 0.5
+  shakeDuration: 0.1
+  shakeMagnitude: 0.2
 --- !u!1 &1508493264
 GameObject:
   m_ObjectHideFlags: 0
