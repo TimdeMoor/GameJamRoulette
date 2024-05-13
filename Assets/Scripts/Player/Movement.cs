@@ -91,7 +91,8 @@ public class Movement : MonoBehaviour
     
     private void OnJumpPerformed(InputAction.CallbackContext value)
     {
-        Debug.Log("OnJumpPerformed");
+        StartCombo("J");
+        CheckCombo();
     }
     
     private void OnLightAttackPerformed(InputAction.CallbackContext value)
@@ -146,18 +147,18 @@ public class Movement : MonoBehaviour
         switch (currentCombo)
         {
             case "LLH":
-                Debug.Log("QuickSmash!");
                 CameraShaker.Instance.Shake();
+                PopUpSpawner.instance.SpawnPopUp(transform.position, "QuickSmash!");
                 ResetCombo();
                 break;
             case "LLL":
-                Debug.Log("TripleStrike!");
                 CameraShaker.Instance.Shake();
+                PopUpSpawner.instance.SpawnPopUp(transform.position, "TripleStrike!");
                 ResetCombo();
                 break;
-            case "LHL":
-                Debug.Log("GroundPound!");
+            case "JJL":
                 CameraShaker.Instance.Shake();
+                PopUpSpawner.instance.SpawnPopUp(transform.position, "JumpKick!");
                 ResetCombo();
                 break;
             default: 
