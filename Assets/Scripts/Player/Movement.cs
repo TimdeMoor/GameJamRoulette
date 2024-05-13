@@ -19,16 +19,13 @@ public class Movement : MonoBehaviour
 
     public bool isSprinting = false;
 
-    [SerializeField] private float lightAttackCooldown = .3f;
-    [SerializeField] private float heavyAttackCooldown = 1f;
+    [SerializeField] private float AttackCooldown = .3f;
     [SerializeField] private float comboCooldown = 3f;
     
-    private float lightAttackCooldownTimer = 0f;
-    private float heavyAttackCooldownTimer = 0f;
+    private float AttackCooldownTimer = 0f;
     private float comboCooldownTimer = 0f;
 
-    private bool lightAttackReady => lightAttackCooldownTimer <= 0f;
-    private bool heavyAttackReady => heavyAttackCooldownTimer <= 0f;
+    private bool AttackReady => AttackCooldownTimer <= 0f;
 
     private string currentCombo = "";
     private bool comboMode = false;    
@@ -57,13 +54,11 @@ public class Movement : MonoBehaviour
     }
 
     private void Update()
-    {
-        lightAttackCooldownTimer -= Time.deltaTime;
-        heavyAttackCooldownTimer -= Time.deltaTime;
+    { 
+        AttackCooldownTimer -= Time.deltaTime;
         comboCooldownTimer -= Time.deltaTime;
 
-        lightAttackCooldownTimer = Mathf.Clamp(lightAttackCooldownTimer, 0f, lightAttackCooldown);
-        heavyAttackCooldownTimer = Mathf.Clamp(heavyAttackCooldownTimer, 0f, heavyAttackCooldown);
+        AttackCooldownTimer = Mathf.Clamp(AttackCooldownTimer, 0f, AttackCooldown);
         comboCooldownTimer = Mathf.Clamp(comboCooldownTimer, 0f, comboCooldown);
 
         if (comboCooldownTimer <= 0f && comboMode)
@@ -97,8 +92,8 @@ public class Movement : MonoBehaviour
     
     private void OnLightAttackPerformed(InputAction.CallbackContext value)
     {
-        if (!lightAttackReady) return;
-        lightAttackCooldownTimer = lightAttackCooldown;
+        if (!AttackReady) return;
+        AttackCooldownTimer = AttackCooldown;
 
         StartCombo("L");
         CheckCombo();
@@ -116,8 +111,8 @@ public class Movement : MonoBehaviour
 
     private void OnHeavyAttackPerformed(InputAction.CallbackContext value)
     {
-        if (!heavyAttackReady) return;
-        heavyAttackCooldownTimer = heavyAttackCooldown;
+        if (!AttackReady) return;
+        AttackCooldownTimer = AttackCooldown;
 
         StartCombo("H");
         CheckCombo();
