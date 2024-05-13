@@ -22,13 +22,23 @@ public class Movement : MonoBehaviour
     [SerializeField] private float AttackCooldown = .3f;
     [SerializeField] private float comboCooldown = 3f;
     
+    
     private float AttackCooldownTimer = 0f;
     private float comboCooldownTimer = 0f;
 
     private bool AttackReady => AttackCooldownTimer <= 0f;
 
     private string currentCombo = "";
-    private bool comboMode = false;    
+    private bool comboMode = false;
+
+    private Animator animator;
+    private int attackCounter = 0;
+
+    private void Start()
+    {
+        animator = GetComponent<Animator>();
+    }
+    
     private void Awake()
     {
         input = new DefaultControls();
@@ -86,7 +96,7 @@ public class Movement : MonoBehaviour
     
     private void OnJumpPerformed(InputAction.CallbackContext value)
     {
-        StartCombo("J");
+        AddCombo("J");
         CheckCombo();
     }
     
@@ -95,7 +105,10 @@ public class Movement : MonoBehaviour
         if (!AttackReady) return;
         AttackCooldownTimer = AttackCooldown;
 
-        StartCombo("L");
+        attackCounter++;
+        //animator.SetInteger("punch", attackCounter);
+        
+        AddCombo("L");
         CheckCombo();
     }
     
@@ -114,7 +127,7 @@ public class Movement : MonoBehaviour
         if (!AttackReady) return;
         AttackCooldownTimer = AttackCooldown;
 
-        StartCombo("H");
+        AddCombo("H");
         CheckCombo();
     }
 
@@ -162,7 +175,7 @@ public class Movement : MonoBehaviour
         }
     }
 
-    private void StartCombo(string comboType)
+    private void AddCombo(string comboType)
     {
         comboMode = true;
         currentCombo += comboType;
@@ -173,6 +186,7 @@ public class Movement : MonoBehaviour
         comboMode = false;
         currentCombo = "";
         comboCooldownTimer = 0f;
+        attackCounter = 0;
         Debug.Log("ComboReset");
     }
 }
